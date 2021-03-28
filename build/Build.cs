@@ -21,7 +21,7 @@ partial class Build : NukeBuild
 
     static readonly string _solutionName = "BaseCliTool";
     static readonly string _runtimeId = "win-x64";
-    static readonly string _targetFramework = "netcoreapp3.1";
+    static readonly string _targetFramework = "net5.0";
     static readonly int _coveragePercentMinimum = 0;
 
     static readonly string _coverageFilters =
