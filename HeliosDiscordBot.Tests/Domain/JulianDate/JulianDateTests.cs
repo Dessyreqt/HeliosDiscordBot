@@ -11,9 +11,9 @@
         [InlineData(2010, 1, 9, 23, 15, 0, 2455206.46875)]
         [InlineData(2010, 2, 14, 13, 21, 0, 2455242.05625)]
         [InlineData(2010, 1, 28, 9, 25, 0, 2455224.89236)]
-        public void ConvertWorks(int year, int month, int day, int hour, int minute, int second, decimal julianDate)
+        public void ConvertWorks(int year, int month, int day, int hour, int minute, int second, double julianDate)
         {
-            HeliosDiscordBot.Domain.JulianDate.Convert(year, month, day, hour, minute, second).ShouldBe(julianDate, 0.00001m);
+            HeliosDiscordBot.Domain.JulianDate.Convert(year, month, day, hour, minute, second).ShouldBe(julianDate, 0.00001);
         }
     }
 }
