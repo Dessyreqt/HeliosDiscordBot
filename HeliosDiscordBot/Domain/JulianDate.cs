@@ -16,5 +16,41 @@
             
             return julianDay + julianTime;
         }
+
+        public static DateTime Convert(double julianDate)
+        {
+            // Richards algorithm from wikipedia
+            var y = 4716;
+            var j = 1401;
+            var m = 2;
+            var n = 12;
+            var r = 4;
+            var p = 1461;
+            var v = 3;
+            var u = 5;
+            var s = 153;
+            var w = 2;
+            var B = 274277;
+            var C = -38;
+            var J = (int)julianDate;
+            var f = J + j + (((4 * J + B) / 146097) * 3) / 4 + C;
+            var e = r * f + v;
+            var g = (e % p) / r;
+            var h = u * g + w;
+            var D = (h % s) / u + 1;
+            var M = ((h / s + m) % n) + 1;
+            var Y = (e / p) - y + (n + m - M) / n;
+
+            var julianTime = julianDate - J;
+            var addHour = julianTime * 24;
+            var addHourInt = (int)addHour;
+            var addMinute = (addHour - addHourInt) * 60;
+            var addMinuteInt = (int)addMinute;
+            var addSecond = (addMinute - addMinuteInt) * 60;
+            var addSecondInt = Math.Round(addSecond, MidpointRounding.AwayFromZero);
+
+            var dateTime = new DateTime(Y, M, D, 12, 0, 0, DateTimeKind.Utc).AddHours(addHourInt).AddMinutes(addMinuteInt).AddSeconds(addSecondInt);
+            return dateTime;
+        }
     }
 }
