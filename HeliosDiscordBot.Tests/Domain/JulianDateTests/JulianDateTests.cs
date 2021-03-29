@@ -1,6 +1,6 @@
-﻿namespace HeliosDiscordBot.Tests.Domain.JulianDate
+﻿namespace HeliosDiscordBot.Tests.Domain.JulianDateTests
 {
-    using System;
+    using HeliosDiscordBot.Domain;
     using Shouldly;
     using Xunit;
 
@@ -13,7 +13,7 @@
         [InlineData(2010, 1, 28, 9, 25, 0, 2455224.89236)]
         public void ConvertToJulianDateWorks(int year, int month, int day, int hour, int minute, int second, double julianDate)
         {
-            HeliosDiscordBot.Domain.JulianDate.Convert(year, month, day, hour, minute, second).ShouldBe(julianDate, 0.00001);
+            JulianDate.Convert(year, month, day, hour, minute, second).ShouldBe(julianDate, 0.00001);
         }
 
         [Theory]
@@ -23,7 +23,7 @@
         [InlineData(2010, 1, 28, 9, 25, 0, 2455224.89236)]
         public void ConvertFromJulianDateWorks(int year, int month, int day, int hour, int minute, int second, double julianDate)
         {
-            var dateTime = HeliosDiscordBot.Domain.JulianDate.Convert(julianDate);
+            var dateTime = JulianDate.Convert(julianDate);
 
             dateTime.ShouldSatisfyAllConditions(
                 () => dateTime.Year.ShouldBe(year),
