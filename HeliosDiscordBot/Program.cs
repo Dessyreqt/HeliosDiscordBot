@@ -42,6 +42,9 @@ namespace HeliosDiscordBot
                 {
                     var config = hostContext.Configuration;
                     services.Configure<DiscordSettings>(config.GetSection(nameof(DiscordSettings)));
+
+                    services.AddSingleton(services);
+
                     services.AddHostedService<Worker>();
                 });
     }
