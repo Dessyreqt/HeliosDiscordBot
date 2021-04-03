@@ -1,9 +1,11 @@
 namespace HeliosDiscordBot
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Discord;
+    using Discord.Commands;
     using Discord.WebSocket;
     using HeliosDiscordBot.Domain;
     using HeliosDiscordBot.Settings;
@@ -16,6 +18,7 @@ namespace HeliosDiscordBot
         private readonly ILogger<Worker> _logger;
         private readonly DiscordSettings _discordSettings;
         private readonly DiscordSocketClient _client;
+        private readonly CommandService _commands;
 
         public Worker(ILogger<Worker> logger, IOptions<DiscordSettings> discordSettings)
         {
@@ -23,6 +26,8 @@ namespace HeliosDiscordBot
             _discordSettings = discordSettings.Value;
             _client = new DiscordSocketClient();
             _client.Log += Log;
+            _commands = new CommandService();
+            _commands.Log += Log;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -46,7 +51,13 @@ namespace HeliosDiscordBot
 
         private Task Log(LogMessage message)
         {
-            _logger.LogInformation(message.ToString(prependTimestamp: false));
+            if (message.Exception is CommandException cmdException)
+            {
+                _logger.LogInformation($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()} failed to execute in {cmdException.Context.Channel}.");
+                _logger.LogError(cmdException, message.ToString(prependTimestamp: false));
+            }
+            
+            _logger.LogInformation($"[General/{message.Severity}] {message.ToString(prependTimestamp: false)}");
             return Task.CompletedTask;
         }
     }
