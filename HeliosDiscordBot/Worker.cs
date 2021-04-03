@@ -36,17 +36,24 @@ namespace HeliosDiscordBot
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            OutputSunriseSunset();
-            await InstallCommandsAsync();
-
-            _logger.LogInformation("Logging into Discord...");
-            await _client.LoginAsync(TokenType.Bot, _discordSettings.Token);
-            await _client.StartAsync();
-            await _client.SetGameAsync("DM me !help to start");
-
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                await Task.Delay(1000, stoppingToken);
+                OutputSunriseSunset();
+                await InstallCommandsAsync();
+
+                _logger.LogInformation("Logging into Discord...");
+                await _client.LoginAsync(TokenType.Bot, _discordSettings.Token);
+                await _client.StartAsync();
+                await _client.SetGameAsync("DM me !help to start");
+
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    await Task.Delay(1000, stoppingToken);
+                }
+            }
+            finally
+            {
+                await _client.StopAsync();
             }
         }
 
