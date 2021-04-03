@@ -28,6 +28,11 @@ namespace HeliosDiscordBot
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).UseSerilog().UseWindowsService().ConfigureServices((hostContext, services) => { services.AddHostedService<Worker>(); });
+            Host.CreateDefaultBuilder(args).UseSerilog().UseWindowsService().ConfigureServices(
+                (hostContext, services) =>
+                {
+                    var config = hostContext.Configuration;
+                    services.AddHostedService<Worker>();
+                });
     }
 }
