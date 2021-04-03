@@ -1,6 +1,8 @@
 namespace HeliosDiscordBot
 {
     using System;
+    using HeliosDiscordBot.Settings;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Serilog;
@@ -28,10 +30,18 @@ namespace HeliosDiscordBot
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).UseSerilog().UseWindowsService().ConfigureServices(
+            Host.CreateDefaultBuilder(args).UseSerilog().UseWindowsService().ConfigureAppConfiguration(
+                (hostContext, builder) =>
+                {
+                    if (hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        builder.AddUserSecrets<Program>();
+                    }
+                }).ConfigureServices(
                 (hostContext, services) =>
                 {
                     var config = hostContext.Configuration;
+                    services.Configure<DiscordSettings>(config.GetSection(nameof(DiscordSettings)));
                     services.AddHostedService<Worker>();
                 });
     }
