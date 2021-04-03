@@ -42,6 +42,7 @@ namespace HeliosDiscordBot
             _logger.LogInformation("Logging into Discord...");
             await _client.LoginAsync(TokenType.Bot, _discordSettings.Token);
             await _client.StartAsync();
+            await _client.SetGameAsync("DM me !help to start");
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -67,6 +68,12 @@ namespace HeliosDiscordBot
             // Don't process the command if it was a system message
             var message = messageParam as SocketUserMessage;
             if (message == null)
+            {
+                return;
+            }
+
+            // Only process commands in DMs
+            if (!(message.Channel is SocketDMChannel))
             {
                 return;
             }
