@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeliosDiscordBot", "HeliosD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{89DB8956-F6BE-466E-9235-F87BDD1B3D72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeliosDiscordBot.Tests", "HeliosDiscordBot.Tests\HeliosDiscordBot.Tests.csproj", "{AF72210F-7F2D-4789-80BF-33B882DCBD12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeliosDiscordBot.Tests", "HeliosDiscordBot.Tests\HeliosDiscordBot.Tests.csproj", "{AF72210F-7F2D-4789-80BF-33B882DCBD12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

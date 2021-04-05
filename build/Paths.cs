@@ -11,4 +11,8 @@ partial class Build
     AbsolutePath _dotCoverExePath => _dotCoverDir / "dotCover.exe";
     AbsolutePath _coverageReportHtmlPath => _baseDir / "CoverageReports" / "CoverageReport.html";
     AbsolutePath _coverageReportXmlPath => _baseDir / "CoverageReports" / "CoverageReport.xml";
+    AbsolutePath _roundhouseDir => _baseDir / "tools" / "roundhouse";
+    AbsolutePath _roundhouseExePath => _roundhouseDir / "rh.exe";
+    AbsolutePath _databaseDirectory => _baseDir / "db";
+    AbsolutePath _createDatabaseScript => _databaseDirectory / "create.sql";
 }
