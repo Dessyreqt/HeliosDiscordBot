@@ -8,8 +8,9 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 CREATE TABLE [dbo].[Notification](
-	[UserId] [int] IDENTITY(1,1) NOT NULL,
+	[NotificationId] [int] IDENTITY(1,1) NOT NULL,
 	[Username] [varchar](255) NOT NULL,
+	[ChannelId] [varchar](30) NOT NULL,
 	[Latitude] [decimal](10, 7) NOT NULL,
 	[Longitude] [decimal](10, 7) NOT NULL,
 	[NotifySunrise] [int] NULL,
@@ -19,7 +20,7 @@ CREATE TABLE [dbo].[Notification](
 	[Timezone] [varchar](100) NULL,
  CONSTRAINT [PK_Notification] PRIMARY KEY CLUSTERED 
 (
-	[UserId] ASC
+	[NotificationId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

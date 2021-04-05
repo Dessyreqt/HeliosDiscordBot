@@ -7,6 +7,7 @@ namespace HeliosDiscordBot
     using System.Threading.Tasks;
     using Discord;
     using Discord.Commands;
+    using Discord.Rest;
     using Discord.WebSocket;
     using HeliosDiscordBot.Domain;
     using HeliosDiscordBot.Settings;
@@ -23,6 +24,8 @@ namespace HeliosDiscordBot
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
 
+        private bool _ready = false;
+
         public Worker(ILogger<Worker> logger, IServiceCollection services, IOptions<DiscordSettings> discordSettings)
         {
             _logger = logger;
@@ -30,6 +33,7 @@ namespace HeliosDiscordBot
             _discordSettings = discordSettings.Value;
             _client = new DiscordSocketClient();
             _client.Log += LogAsync;
+            _client.Ready += ReadyAsync;
             _commands = new CommandService();
             _commands.Log += LogAsync;
         }
@@ -44,7 +48,20 @@ namespace HeliosDiscordBot
                 _logger.LogInformation("Logging into Discord...");
                 await _client.LoginAsync(TokenType.Bot, _discordSettings.Token);
                 await _client.StartAsync();
+
+                while (!_ready)
+                {
+                    await Task.Delay(100, stoppingToken);
+                }
+
                 await _client.SetGameAsync("DM me !help to start");
+
+                var rawChannel = await _client.Rest.GetChannelAsync(827804539749924874);
+                var channel = rawChannel as IDMChannel;
+                if (channel != null)
+                {
+                    await channel.SendMessageAsync("Goliath online.");
+                }
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
@@ -55,6 +72,12 @@ namespace HeliosDiscordBot
             {
                 await _client.StopAsync();
             }
+        }
+
+        private Task ReadyAsync()
+        {
+            _ready = true;
+            return Task.CompletedTask;
         }
 
         private async Task InstallCommandsAsync()

@@ -128,7 +128,7 @@ partial class Build : NukeBuild
         }
 
         startInfo.Arguments = args ?? string.Empty;
-        startInfo.UseShellExecute = true;
+        startInfo.UseShellExecute = false;
 
         var process = Process.Start(startInfo);
 
