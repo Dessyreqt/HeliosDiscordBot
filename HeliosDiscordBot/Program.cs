@@ -1,6 +1,7 @@
 namespace HeliosDiscordBot
 {
     using System;
+    using HeliosDiscordBot.Repository;
     using HeliosDiscordBot.Settings;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +44,8 @@ namespace HeliosDiscordBot
                     var config = hostContext.Configuration;
                     services.Configure<DiscordSettings>(config.GetSection(nameof(DiscordSettings)));
                     services.Configure<DatabaseSettings>(config.GetSection(nameof(DatabaseSettings)));
+
+                    services.AddTransient<IDatabaseRepository, DatabaseRepository>();
 
                     services.AddSingleton(services);
 
