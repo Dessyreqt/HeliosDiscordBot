@@ -32,6 +32,7 @@
             notification.NextNotifySunsetUtc = null;
 
             await _repo.SaveNotificationAsync(notification);
+            await ReplyAsync($"Your location is now latitude {notification.Latitude:###.#######}, longitude {notification.Longitude:###.#######}.");
         }
     }
 }
