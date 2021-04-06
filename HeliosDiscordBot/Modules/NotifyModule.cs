@@ -31,5 +31,23 @@
             await _repo.SaveNotificationAsync(notification);
             await ReplyAsync($"I will notify you of sunrise {minutes} minutes before it happens.");
         }
+
+        [Command("sunset")]
+        [Summary("Sets a notification time for sunset")]
+        public async Task NotifySunsetAsync(int minutes)
+        {
+            var channelId = Context.Channel.Id;
+            var notification = await _repo.GetNotificationByChannelIdAsync(channelId);
+            
+            if (notification == null)
+            {
+                await ReplyAsync("You need to set a location first by using `!setlocation <latitude> <longitude>`. For example `!setlocation 37.8199286 -122.4795565`");
+                return;
+            }
+
+            notification.NotifySunset = minutes;
+            await _repo.SaveNotificationAsync(notification);
+            await ReplyAsync($"I will notify you of sunset {minutes} minutes before it happens.");
+        }
     }
 }
