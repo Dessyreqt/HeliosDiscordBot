@@ -99,7 +99,7 @@ namespace HeliosDiscordBot
             {
                 var minutesToSunrise = (int)Math.Round((sunriseTime - currentDate).TotalMinutes);
                 var channelId = ulong.Parse(notification.ChannelId);
-                var convertedSunriseTime = ConvertToLocalTime(sunriseTime, notification.Timezone);
+                var convertedSunriseTime = sunriseTime.ToTimeZone(notification.Timezone);
                 await SendMessage(channelId, $"Sunrise is at {convertedSunriseTime:h:mm:ss tt}, which is about {minutesToSunrise} minutes from now.");
             }
 
@@ -115,26 +115,12 @@ namespace HeliosDiscordBot
             {
                 var minutesToSunset = (int)Math.Round((sunsetTime - currentDate).TotalMinutes);
                 var channelId = ulong.Parse(notification.ChannelId);
-                var convertedSunsetTime = ConvertToLocalTime(sunsetTime, notification.Timezone);
+                var convertedSunsetTime = sunsetTime.ToTimeZone(notification.Timezone);
                 await SendMessage(channelId, $"Sunset is at {convertedSunsetTime:h:mm:ss tt}, which is about {minutesToSunset} minutes from now.");
             }
 
             UpdateSunset(notification, currentDate);
             await _repo.SaveNotificationAsync(notification);
-        }
-
-        private DateTime ConvertToLocalTime(DateTime currentDate, string notificationTimezone)
-        {
-            var foundZone = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(zone => zone.DisplayName == notificationTimezone);
-
-            if (foundZone == null)
-            {
-                return currentDate;
-            }
-
-            var currentTimeInZone = TimeZoneInfo.ConvertTimeFromUtc(currentDate, foundZone);
-
-            return currentTimeInZone;
         }
 
         private async Task SetNextNotificationTimesAsync()
