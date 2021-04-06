@@ -23,7 +23,7 @@
             
             if (notification == null)
             {
-                await ReplyAsync("You need to set a location first by using `!setlocation <latitude> <longitude>`. For example `!setlocation 37.8199286 -122.4795565`");
+                await ReplyAsync("You need to set a location first by using `!setlocation <latitude> <longitude>`. For example, `!setlocation 37.8199286 -122.4795565`.");
                 return;
             }
 
@@ -42,7 +42,7 @@
             
             if (notification == null)
             {
-                await ReplyAsync("You need to set a location first by using `!setlocation <latitude> <longitude>`. For example `!setlocation 37.8199286 -122.4795565`");
+                await ReplyAsync("You need to set a location first by using `!setlocation <latitude> <longitude>`. For example, `!setlocation 37.8199286 -122.4795565`.");
                 return;
             }
 
