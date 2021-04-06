@@ -53,11 +53,11 @@
             return (await connection.QueryAsync<Notification>(sql)).ToList();
         }
 
-        public async Task<List<Notification>> GetUnsetNotificationsAsync(DateTime currentTime)
+        public async Task<List<Notification>> GetExpiredNotificationsAsync(DateTime currentDate)
         {
-            var sql = "SELECT * FROM [Notification] WHERE ([NotifySunrise] IS NOT NULL AND [NextNotifySunriseUtc] < @currentTime) OR ([NotifySunset] IS NOT NULL AND [NextNotifySunsetUtc] < @currentTime)";
+            var sql = "SELECT * FROM [Notification] WHERE ([NotifySunrise] IS NOT NULL AND [NextNotifySunriseUtc] < @currentDate) OR ([NotifySunset] IS NOT NULL AND [NextNotifySunsetUtc] < @currentDate)";
             using var connection = new SqlConnection(_databaseSettings.ConnectionString);
-            return (await connection.QueryAsync<Notification>(sql)).ToList();
+            return (await connection.QueryAsync<Notification>(sql, new { currentDate })).ToList();
         }
     }
 }

@@ -10,5 +10,6 @@
         Task<Notification> GetNotificationByChannelIdAsync(ulong channelId);
         Task SaveNotificationAsync(Notification notification);
         Task<List<Notification>> GetUnsetNotificationsAsync();
+        Task<List<Notification>> GetExpiredNotificationsAsync(DateTime currentDate);
     }
 }

@@ -63,6 +63,7 @@ namespace HeliosDiscordBot
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     await SetNextNotificationTimesAsync();
+                    await SendNotificationsAsync();
                     await Task.Delay(1000, stoppingToken);
                 }
             }
@@ -72,15 +73,53 @@ namespace HeliosDiscordBot
             }
         }
 
-        private async Task SendMessage(ulong channelId, string message)
+        private async Task SendNotificationsAsync()
         {
-            var rawChannel = await _client.Rest.GetChannelAsync(channelId);
-            var channel = rawChannel as IDMChannel;
+            var currentDate = DateTime.UtcNow;
+            var notifications = await _repo.GetExpiredNotificationsAsync(currentDate);
 
-            if (channel != null)
+            foreach (var notification in notifications)
             {
-                await channel.SendMessageAsync(message);
+                if (notification.NotifySunrise != null && notification.NextNotifySunriseUtc < currentDate)
+                {
+                    await NotifySunriseAsync(notification, currentDate);
+                }
+
+                if (notification.NotifySunset != null && notification.NextNotifySunsetUtc < currentDate)
+                {
+                    await NotifySunsetAsync(notification, currentDate);
+                }
             }
+        }
+
+        private async Task NotifySunriseAsync(Notification notification, DateTime currentDate)
+        {
+            var sunriseTime = notification.NextNotifySunriseUtc.Value.AddMinutes(notification.NotifySunrise.Value);
+
+            if (currentDate < sunriseTime)
+            {
+                var minutesToSunrise = (int)Math.Round((sunriseTime - currentDate).TotalMinutes);
+                var channelId = ulong.Parse(notification.ChannelId);
+                await SendMessage(channelId, $"Sunrise is at {sunriseTime:h:mm:ss tt}, which is about {minutesToSunrise} minutes from now.");
+            }
+
+            UpdateSunrise(notification, currentDate);
+            await _repo.SaveNotificationAsync(notification);
+        }
+
+        private async Task NotifySunsetAsync(Notification notification, DateTime currentDate)
+        {
+            var sunsetTime = notification.NextNotifySunsetUtc.Value.AddMinutes(notification.NotifySunset.Value);
+
+            if (currentDate < sunsetTime)
+            {
+                var minutesToSunset = (int)Math.Round((sunsetTime - currentDate).TotalMinutes);
+                var channelId = ulong.Parse(notification.ChannelId);
+                await SendMessage(channelId, $"Sunset is at {sunsetTime:h:mm:ss tt}, which is about {minutesToSunset} minutes from now.");
+            }
+
+            UpdateSunset(notification, currentDate);
+            await _repo.SaveNotificationAsync(notification);
         }
 
         private async Task SetNextNotificationTimesAsync()
@@ -132,6 +171,17 @@ namespace HeliosDiscordBot
             }
 
             notification.NextNotifySunsetUtc = calculation.Sunset.AddMinutes(-notification.NotifySunset.Value);
+        }
+
+        private async Task SendMessage(ulong channelId, string message)
+        {
+            var rawChannel = await _client.Rest.GetChannelAsync(channelId);
+            var channel = rawChannel as IDMChannel;
+
+            if (channel != null)
+            {
+                await channel.SendMessageAsync(message);
+            }
         }
 
         private Task ReadyAsync()
