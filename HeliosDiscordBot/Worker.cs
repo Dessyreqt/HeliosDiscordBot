@@ -10,6 +10,7 @@ namespace HeliosDiscordBot
     using Discord.Rest;
     using Discord.WebSocket;
     using HeliosDiscordBot.Domain;
+    using HeliosDiscordBot.Repository;
     using HeliosDiscordBot.Settings;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -20,16 +21,18 @@ namespace HeliosDiscordBot
     {
         private readonly ILogger<Worker> _logger;
         private readonly IServiceCollection _services;
+        private readonly IDatabaseRepository _repo;
         private readonly DiscordSettings _discordSettings;
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
 
         private bool _ready = false;
 
-        public Worker(ILogger<Worker> logger, IServiceCollection services, IOptions<DiscordSettings> discordSettings)
+        public Worker(ILogger<Worker> logger, IServiceCollection services, IDatabaseRepository repo, IOptions<DiscordSettings> discordSettings)
         {
             _logger = logger;
             _services = services;
+            _repo = repo;
             _discordSettings = discordSettings.Value;
             _client = new DiscordSocketClient();
             _client.Log += LogAsync;
@@ -55,16 +58,11 @@ namespace HeliosDiscordBot
                 }
 
                 await _client.SetGameAsync("DM me !help to start");
-
-                var rawChannel = await _client.Rest.GetChannelAsync(827804539749924874);
-                var channel = rawChannel as IDMChannel;
-                if (channel != null)
-                {
-                    await channel.SendMessageAsync("Goliath online.");
-                }
+                await SendMessage(827804539749924874, "Goliath online.");
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
+                    await SetNextNotificationTimesAsync();
                     await Task.Delay(1000, stoppingToken);
                 }
             }
@@ -72,6 +70,68 @@ namespace HeliosDiscordBot
             {
                 await _client.StopAsync();
             }
+        }
+
+        private async Task SendMessage(ulong channelId, string message)
+        {
+            var rawChannel = await _client.Rest.GetChannelAsync(channelId);
+            var channel = rawChannel as IDMChannel;
+
+            if (channel != null)
+            {
+                await channel.SendMessageAsync(message);
+            }
+        }
+
+        private async Task SetNextNotificationTimesAsync()
+        {
+            var currentDate = DateTime.UtcNow;
+            var notifications = await _repo.GetUnsetNotificationsAsync();
+
+            foreach (var notification in notifications)
+            {
+                if (notification.NotifySunrise != null && notification.NextNotifySunriseUtc == null)
+                {
+                    UpdateSunrise(notification, currentDate);
+                }
+
+                if (notification.NotifySunset != null && notification.NextNotifySunsetUtc == null)
+                {
+                    UpdateSunset(notification, currentDate);
+                }
+
+                await _repo.SaveNotificationAsync(notification);
+            }
+        }
+
+        private void UpdateSunrise(Notification notification, DateTime currentDate)
+        {
+            // start one day back in case
+            var date = DateTime.UtcNow.Date.AddHours(12).AddDays(-1);
+            var calculation = new SolarCalculation(notification.Latitude, notification.Longitude, date);
+            
+            while (calculation.Sunrise.AddMinutes(-notification.NotifySunrise.Value) < currentDate)
+            {
+                date = date.AddDays(1);
+                calculation = new SolarCalculation(notification.Latitude, notification.Longitude, date);
+            }
+
+            notification.NextNotifySunriseUtc = calculation.Sunrise.AddMinutes(-notification.NotifySunrise.Value);
+        }
+
+        private void UpdateSunset(Notification notification, DateTime currentDate)
+        {
+            // start one day back in case
+            var date = DateTime.UtcNow.Date.AddHours(12).AddDays(-1);
+            var calculation = new SolarCalculation(notification.Latitude, notification.Longitude, date);
+            
+            while (calculation.Sunset.AddMinutes(-notification.NotifySunset.Value) < currentDate)
+            {
+                date = date.AddDays(1);
+                calculation = new SolarCalculation(notification.Latitude, notification.Longitude, date);
+            }
+
+            notification.NextNotifySunsetUtc = calculation.Sunset.AddMinutes(-notification.NotifySunset.Value);
         }
 
         private Task ReadyAsync()

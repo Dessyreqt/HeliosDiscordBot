@@ -1,5 +1,7 @@
 ﻿namespace HeliosDiscordBot.Repository
 {
+    using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using HeliosDiscordBot.Domain;
 
@@ -7,5 +9,6 @@
     {
         Task<Notification> GetNotificationByChannelIdAsync(ulong channelId);
         Task SaveNotificationAsync(Notification notification);
+        Task<List<Notification>> GetUnsetNotificationsAsync();
     }
 }

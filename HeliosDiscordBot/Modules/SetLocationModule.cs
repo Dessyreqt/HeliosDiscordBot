@@ -16,7 +16,7 @@
 
         [Command("setlocation")]
         [Summary("Sets a location for future sunrise/sunset notifications.")]
-        public async Task SetLocationAsync(decimal latitude, decimal longitude)
+        public async Task SetLocationAsync(double latitude, double longitude)
         {
             var channelId = Context.Channel.Id;
             var notification = await _repo.GetNotificationByChannelIdAsync(channelId);
@@ -28,6 +28,8 @@
 
             notification.Latitude = latitude;
             notification.Longitude = longitude;
+            notification.NextNotifySunriseUtc = null;
+            notification.NextNotifySunsetUtc = null;
 
             await _repo.SaveNotificationAsync(notification);
         }

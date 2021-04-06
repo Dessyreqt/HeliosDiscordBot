@@ -28,6 +28,7 @@
             }
 
             notification.NotifySunrise = minutes;
+            notification.NextNotifySunriseUtc = null;
             await _repo.SaveNotificationAsync(notification);
             await ReplyAsync($"I will notify you of sunrise {minutes} minutes before it happens.");
         }
@@ -46,6 +47,7 @@
             }
 
             notification.NotifySunset = minutes;
+            notification.NextNotifySunsetUtc = null;
             await _repo.SaveNotificationAsync(notification);
             await ReplyAsync($"I will notify you of sunset {minutes} minutes before it happens.");
         }

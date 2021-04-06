@@ -1,6 +1,9 @@
 ﻿namespace HeliosDiscordBot.Repository
 {
+    using System;
+    using System.Collections.Generic;
     using System.Data.SqlClient;
+    using System.Linq;
     using System.Threading.Tasks;
     using Dapper;
     using HeliosDiscordBot.Domain;
@@ -41,6 +44,20 @@
 
             using var connection = new SqlConnection(_databaseSettings.ConnectionString);
             await connection.ExecuteAsync(sql, notification);
+        }
+
+        public async Task<List<Notification>> GetUnsetNotificationsAsync()
+        {
+            var sql = "SELECT * FROM [Notification] WHERE ([NotifySunrise] IS NOT NULL AND [NextNotifySunriseUtc] IS NULL) OR ([NotifySunset] IS NOT NULL AND [NextNotifySunsetUtc] IS NULL)";
+            using var connection = new SqlConnection(_databaseSettings.ConnectionString);
+            return (await connection.QueryAsync<Notification>(sql)).ToList();
+        }
+
+        public async Task<List<Notification>> GetUnsetNotificationsAsync(DateTime currentTime)
+        {
+            var sql = "SELECT * FROM [Notification] WHERE ([NotifySunrise] IS NOT NULL AND [NextNotifySunriseUtc] < @currentTime) OR ([NotifySunset] IS NOT NULL AND [NextNotifySunsetUtc] < @currentTime)";
+            using var connection = new SqlConnection(_databaseSettings.ConnectionString);
+            return (await connection.QueryAsync<Notification>(sql)).ToList();
         }
     }
 }
