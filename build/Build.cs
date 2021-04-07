@@ -72,7 +72,7 @@ partial class Build : NukeBuild
                 .SetVerbosity(DotNetVerbosity.Quiet));
         });
 
-    Target RestoreSolution => _ => _
+    Target Restore => _ => _
         .After(Clean)
         .Executes(() =>
         {
@@ -81,7 +81,7 @@ partial class Build : NukeBuild
         });
 
     Target Compile => _ => _
-        .After(RestoreSolution)
+        .After(Restore)
         .Executes(() =>
         {
             DotNetBuild(s => s
