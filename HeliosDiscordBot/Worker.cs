@@ -57,7 +57,6 @@ namespace HeliosDiscordBot
                 }
 
                 await _client.SetGameAsync("DM me !help to start");
-                await SendMessage(827804539749924874, "Goliath online.");
 
                 while (!stoppingToken.IsCancellationRequested)
                 {
