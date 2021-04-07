@@ -36,7 +36,7 @@ namespace HeliosDiscordBot
                 {
                     if (hostContext.HostingEnvironment.IsDevelopment())
                     {
-                        //builder.AddUserSecrets<Program>();
+                        builder.AddUserSecrets<Program>();
                     }
                     builder.AddEnvironmentVariables("HeliosDiscordBot_");
                 }).ConfigureServices(

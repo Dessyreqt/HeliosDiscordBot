@@ -9,7 +9,7 @@ pipeline {
 
 		stage('Database') {
 			when {
-				branch 'main'
+				tag 'v*'
 			}
 			steps {
 				bat 'nuke RestoreDatabase'
@@ -26,7 +26,7 @@ pipeline {
 
 		stage('Deploy') {
 			when {
-				branch 'main'
+				tag 'v*'
 			}
 			steps {
 				powershell 'Stop-Service HeliosDiscordBot'
