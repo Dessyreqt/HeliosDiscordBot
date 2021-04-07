@@ -26,6 +26,7 @@ Finally, if you want me to convert times to your timezone, I can do that provide
 `!stopnotify sunset` - will stop notifying about sunset
 `!listtimezones` - will list the time zones I know about
 `!settimezone <time zone>` - (Example: `!settimezone (UTC+08:00) Perth`) - will set your timezone to W. Australia Standard/Daylight Time");
+            await ReplyAsync(@"If you have any questions, comments, or suggestions, please visit my github at https://github.com/Dessyreqt/HeliosDiscordBot. There you will also find more detailed usage instructions, as well as full source and some brief setup instructions. Please submit an issue there if you have a feature request, and bug, or even a question that isn't explained well by the documentation. Thanks!");
         }
     }
 }
