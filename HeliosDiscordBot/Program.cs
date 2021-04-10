@@ -12,8 +12,11 @@ namespace HeliosDiscordBot
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().WriteTo
-                .Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}").CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.File(@"C:\logs\HeliosDiscordBot\log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
 
             try
             {
