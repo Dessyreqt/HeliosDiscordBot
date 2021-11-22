@@ -2,7 +2,7 @@
 
 Helios is a discord bot for notifying you of solar events.
 
-[Add Helios to your server](https://discord.com/api/oauth2/authorize?client_id=827744716132974594&permissions=0&scope=bot), or [https://discord.gg/t4kjy4sPUg](Join my server) to interact with it.
+[Add Helios to your server](https://discord.com/api/oauth2/authorize?client_id=827744716132974594&permissions=0&scope=bot), or [Join my server](https://discord.gg/t4kjy4sPUg) to interact with it.
 
 ## Using Helios
 
