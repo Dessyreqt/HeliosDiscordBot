@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Xml;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
@@ -12,17 +13,9 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 [UnsetVisualStudioEnvironmentVariables]
 partial class Build : NukeBuild
 {
-    public static int Main() => Execute<Build>(x => x.Compile);
-
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
-    [Solution] readonly Solution _solution;
-    [GitRepository] readonly GitRepository _gitRepository;
-
     static readonly string _solutionName = "HeliosDiscordBot";
     static readonly string _runtimeId = "win-x64";
-    static readonly string _targetFramework = "net5.0";
+    static readonly string _targetFramework = "net6.0";
     static readonly int _coveragePercentMinimum = 0;
     static readonly string _publishPath = @"C:\Workers\HeliosDiscordBot";
     static readonly string _databaseName = "HeliosDiscordBot";
@@ -30,6 +23,12 @@ partial class Build : NukeBuild
 
     static readonly string _coverageFilters =
         $"+:type={_solutionName}.Commands.*;+:type={_solutionName}.Data.*;+:type={_solutionName}.Events.*;+:type={_solutionName}.Map.*;+:type={_solutionName}.Messages.*;-:module={_solutionName}.Data.Lookup";
+
+    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
+    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+
+    [Solution] readonly Solution _solution;
+    [GitRepository] readonly GitRepository _gitRepository;
 
     Target DropAndRestoreDatabase => _ => _
         .Before(Clean)
@@ -42,13 +41,11 @@ partial class Build : NukeBuild
         .Before(Clean)
         .Executes(() =>
         {
-            var process = Run(_roundhouseExePath, $"/d=\"{_databaseName}\" /f=\"{_databaseDirectory}\" /s=\"{_databaseServer}\" /cds=\"{_createDatabaseScript}\" /silent /transaction");
+            var process = Run(_roundhouseExePath,
+                $"/d=\"{_databaseName}\" /f=\"{_databaseDirectory}\" /s=\"{_databaseServer}\" /cds=\"{_createDatabaseScript}\" /silent /transaction");
             process.WaitForExit();
-            
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}");
-            }
+
+            if (process.ExitCode != 0) { throw new Exception($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}"); }
         });
 
     Target DropDatabase => _ => _
@@ -57,11 +54,8 @@ partial class Build : NukeBuild
         {
             var process = Run(_roundhouseExePath, $"/d=\"{_databaseName}\" /s=\"{_databaseServer}\" /silent /drop");
             process.WaitForExit();
-            
-            if (process.ExitCode != 0)
-            {
-                throw new Exception($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}");
-            }
+
+            if (process.ExitCode != 0) { throw new Exception($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}"); }
         });
 
     Target Clean => _ => _
@@ -106,14 +100,30 @@ partial class Build : NukeBuild
                 .SetOutput(_publishPath));
         });
 
+    Target CiCoverageReport => _ => _
+        .After(Compile)
+        .Executes(() =>
+        {
+            DotNet($"dotcover test --dcOutput=\"{_coverageReportXmlPath}\" --dcReportType=\"XML\" --dcFilters=\"{_coverageFilters}\"",
+                _backendTestDir);
+
+            var coverageReport = new XmlDocument();
+            coverageReport.Load(_coverageReportXmlPath);
+
+            var coveragePercent = int.Parse(coverageReport.SelectSingleNode("/Root/@CoveragePercent").Value);
+            if (coveragePercent < _coveragePercentMinimum) { throw new Exception($"Code coverage is {coveragePercent}%. Minimum allowed is {_coveragePercentMinimum}%."); }
+
+            Logger.Info($"{coveragePercent}% code coverage!");
+        });
+
+
+    public static int Main() => Execute<Build>(x => x.Compile);
+
     Process Run(string exePath, string args = null, bool fromOwnDirectory = false)
     {
         string directory = null;
 
-        if (fromOwnDirectory)
-        {
-            directory = Directory.GetParent(exePath).FullName;
-        }
+        if (fromOwnDirectory) { directory = Directory.GetParent(exePath).FullName; }
 
         return Run(exePath, args, directory);
     }
@@ -122,10 +132,7 @@ partial class Build : NukeBuild
     {
         var startInfo = new ProcessStartInfo(exePath);
 
-        if (workingDirectory != null)
-        {
-            startInfo.WorkingDirectory = workingDirectory;
-        }
+        if (workingDirectory != null) { startInfo.WorkingDirectory = workingDirectory; }
 
         startInfo.Arguments = args ?? string.Empty;
         startInfo.UseShellExecute = false;
