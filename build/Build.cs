@@ -37,7 +37,7 @@ partial class Build : NukeBuild
     [GitRepository] readonly GitRepository _gitRepository;
 
     Target CiPipeline => _ => _
-        .Triggers(Clean, Restore, Compile, CiCoverageReport);
+        .Triggers(Clean, Restore, Compile, Test);
 
     Target DropAndRestoreDatabase => _ => _
         .Before(Clean)
@@ -107,6 +107,14 @@ partial class Build : NukeBuild
                 .SetConfiguration("Release")
                 .SetRuntime(_runtimeId)
                 .SetOutput(_publishPath));
+        });
+
+    Target Test => _ => _
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(_backendTestDir)
+                .SetVerbosity(DotNetVerbosity.Quiet));
         });
 
     Target CiCoverageReport => _ => _
