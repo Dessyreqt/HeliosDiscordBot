@@ -16,7 +16,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     GitHubActionsImage.UbuntuLatest,
     OnPushBranches = new[] { "main" },
     OnPullRequestBranches = new[] { "main" },
-    InvokedTargets = new[] { nameof(CiPipeline) })] // auto-generate using `nuke --generate-configuration GitHubActions_ci --host GitHubActions`
+    InvokedTargets = new[] { "ci-pipeline" })] // auto-generate using `nuke --generate-configuration GitHubActions_ci --host GitHubActions`
 partial class Build : NukeBuild
 {
     static readonly string _solutionName = "HeliosDiscordBot";
