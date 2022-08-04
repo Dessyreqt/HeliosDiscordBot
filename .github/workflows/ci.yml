@@ -37,5 +37,5 @@ jobs:
             .nuke/temp
             ~/.nuget/packages
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
-      - name: Run './build.cmd ci-pipeline'
-        run: ./build.cmd ci-pipeline
+      - name: Run './build.cmd CiPipeline'
+        run: ./build.cmd CiPipeline
