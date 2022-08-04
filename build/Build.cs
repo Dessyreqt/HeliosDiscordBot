@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using Nuke.Common;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.ProjectModel;
@@ -10,6 +11,12 @@ using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [UnsetVisualStudioEnvironmentVariables]
+[GitHubActions(
+    "ci",
+    GitHubActionsImage.UbuntuLatest,
+    OnPushBranches = new[] { "main" },
+    OnPullRequestBranches = new[] { "main" },
+    InvokedTargets = new[] { nameof(CiPipeline) })] // auto-generate using `nuke --generate-configuration GitHubActions_ci --host GitHubActions`
 partial class Build : NukeBuild
 {
     static readonly string _solutionName = "HeliosDiscordBot";
