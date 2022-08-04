@@ -13,7 +13,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 [UnsetVisualStudioEnvironmentVariables]
 [GitHubActions(
     "ci",
-    GitHubActionsImage.UbuntuLatest,
+    GitHubActionsImage.WindowsLatest,
     OnPushBranches = new[] { "main" },
     OnPullRequestBranches = new[] { "main" },
     InvokedTargets = new[] { nameof(CiPipeline) })]
