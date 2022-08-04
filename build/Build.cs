@@ -30,6 +30,9 @@ partial class Build : NukeBuild
     [Solution] readonly Solution _solution;
     [GitRepository] readonly GitRepository _gitRepository;
 
+    Target CiPipeline => _ => _
+        .Triggers(Clean, Restore, Compile, CiCoverageReport);
+
     Target DropAndRestoreDatabase => _ => _
         .Before(Clean)
         .DependsOn(DropDatabase, RestoreDatabase)
@@ -117,7 +120,7 @@ partial class Build : NukeBuild
         });
 
 
-    public static int Main() => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.CiPipeline);
 
     Process Run(string exePath, string args = null, bool fromOwnDirectory = false)
     {
