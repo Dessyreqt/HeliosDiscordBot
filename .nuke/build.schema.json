@@ -84,7 +84,8 @@
               "DropDatabase",
               "Publish",
               "Restore",
-              "RestoreDatabase"
+              "RestoreDatabase",
+              "Test"
             ]
           }
         },
@@ -102,7 +103,8 @@
               "DropDatabase",
               "Publish",
               "Restore",
-              "RestoreDatabase"
+              "RestoreDatabase",
+              "Test"
             ]
           }
         },
