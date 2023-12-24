@@ -107,6 +107,7 @@ partial class Build : NukeBuild
             CopyDirectoryRecursively(_databaseDirectory, _publishDbScriptsPath);
 
             CopyFileToDirectory(_roundhouseExePath, _publishDbPath);
+            CopyFileToDirectory(_dbPackageDeployScript, _publishDbPath);
         });
 
     Target Test => _ => _

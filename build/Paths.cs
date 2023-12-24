@@ -13,6 +13,7 @@ partial class Build
     AbsolutePath _coverageReportXmlPath => _baseDir / "CoverageReports" / "CoverageReport.xml";
     AbsolutePath _roundhouseDir => _baseDir / "tools" / "roundhouse";
     AbsolutePath _roundhouseExePath => _roundhouseDir / "rh.exe";
+    AbsolutePath _dbPackageDeployScript => _roundhouseDir / "Deploy.ps1";
     AbsolutePath _databaseDirectory => _baseDir / "db";
     AbsolutePath _createDatabaseScript => _databaseDirectory / "create.sql";
     AbsolutePath _publishPath => _baseDir / "publish";
