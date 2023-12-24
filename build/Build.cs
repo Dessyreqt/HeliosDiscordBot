@@ -5,9 +5,11 @@ using System.Xml;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
+using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using static Nuke.Common.IO.FileSystemTasks;
 
 [UnsetVisualStudioEnvironmentVariables]
 partial class Build : NukeBuild
@@ -16,7 +18,6 @@ partial class Build : NukeBuild
     static readonly string _runtimeId = "win-x64";
     static readonly string _targetFramework = "net6.0";
     static readonly int _coveragePercentMinimum = 0;
-    static readonly string _publishPath = @".\publish";
     static readonly string _databaseName = "HeliosDiscordBot";
     static readonly string _databaseServer = "localhost";
 
@@ -89,6 +90,8 @@ partial class Build : NukeBuild
     Target Publish => _ => _
         .Executes(() =>
         {
+            _publishPath.DeleteDirectory();
+
             DotNetClean(s => s
                 .SetProject(_projectDir)
                 .SetVerbosity(DotNetVerbosity.Quiet)
@@ -99,7 +102,11 @@ partial class Build : NukeBuild
                 .SetProject(_projectDir)
                 .SetConfiguration("Release")
                 .SetRuntime(_runtimeId)
-                .SetOutput(_publishPath));
+                .SetOutput(_publishBinPath));
+
+            CopyDirectoryRecursively(_databaseDirectory, _publishDbScriptsPath);
+
+            CopyFileToDirectory(_roundhouseExePath, _publishDbPath);
         });
 
     Target Test => _ => _
