@@ -16,7 +16,7 @@ partial class Build : NukeBuild
     static readonly string _runtimeId = "win-x64";
     static readonly string _targetFramework = "net6.0";
     static readonly int _coveragePercentMinimum = 0;
-    static readonly string _publishPath = @"C:\Workers\HeliosDiscordBot";
+    static readonly string _publishPath = @".\publish";
     static readonly string _databaseName = "HeliosDiscordBot";
     static readonly string _databaseServer = "localhost";
 
@@ -30,7 +30,7 @@ partial class Build : NukeBuild
     [GitRepository] readonly GitRepository _gitRepository;
 
     Target CiPipeline => _ => _
-        .Triggers(Clean, Restore, Compile, Test);
+        .Triggers(Clean, Restore, Compile, CiCoverageReport);
 
     Target DropAndRestoreDatabase => _ => _
         .Before(Clean)
