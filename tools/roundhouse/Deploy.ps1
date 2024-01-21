@@ -1,7 +1,6 @@
 $roundhouse_exe_path = ".\rh.exe"
 $db_dir = ".\scripts"
-$db_name = "HeliosDiscordBot"
-$db_server = "localhost"
+$connection_string = $OctopusParameters["DatabaseSettings:ConnectionString"]
 
-&$roundhouse_exe_path /d=$db_name /f=$db_dir /s=$db_server /cds="$db_dir\create.sql" /silent /transaction
+&$roundhouse_exe_path /c=$connection_string /f=$db_dir /cds="$db_dir\create.sql" /silent /transaction
 
