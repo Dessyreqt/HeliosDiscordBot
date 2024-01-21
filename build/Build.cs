@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
@@ -31,130 +30,111 @@ partial class Build : NukeBuild
     [Solution] readonly Solution _solution;
     [GitRepository] readonly GitRepository _gitRepository;
 
-    Target CiPipeline =>
-        _ => _
-            .Triggers(Clean, Restore, Compile, CiCoverageReport);
+    Target CiPipeline => _ => _
+        .Triggers(Clean, Restore, Compile, CiCoverageReport);
 
-    Target DropAndRestoreDatabase =>
-        _ => _
-            .Before(Clean)
-            .DependsOn(DropDatabase, RestoreDatabase)
-            .Executes(() =>
-            {
-            });
+    Target DropAndRestoreDatabase => _ => _
+        .Before(Clean)
+        .DependsOn(DropDatabase, RestoreDatabase)
+        .Executes(() =>
+        {
+        });
 
-    Target RestoreDatabase =>
-        _ => _
-            .Before(Clean)
-            .Executes(() =>
-            {
-                var process = Run(_roundhouseExePath,
-                    $"/d=\"{_databaseName}\" /f=\"{_databaseDirectory}\" /s=\"{_databaseServer}\" /cds=\"{_createDatabaseScript}\" /silent /transaction");
+    Target RestoreDatabase => _ => _
+        .Before(Clean)
+        .Executes(() =>
+        {
+            var process = Run(_roundhouseExePath,
+                $"/d=\"{_databaseName}\" /f=\"{_databaseDirectory}\" /s=\"{_databaseServer}\" /cds=\"{_createDatabaseScript}\" /silent /transaction");
 
-                process.WaitForExit();
+            process.WaitForExit();
 
-                if (process.ExitCode != 0)
-                {
-                    throw new Exception($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}");
-                }
-            });
+            if (process.ExitCode != 0) { throw new($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}"); }
+        });
 
-    Target DropDatabase =>
-        _ => _
-            .Before(RestoreDatabase)
-            .Executes(() =>
-            {
-                var process = Run(_roundhouseExePath, $"/d=\"{_databaseName}\" /s=\"{_databaseServer}\" /silent /drop");
-                process.WaitForExit();
+    Target DropDatabase => _ => _
+        .Before(RestoreDatabase)
+        .Executes(() =>
+        {
+            var process = Run(_roundhouseExePath, $"/d=\"{_databaseName}\" /s=\"{_databaseServer}\" /silent /drop");
+            process.WaitForExit();
 
-                if (process.ExitCode != 0)
-                {
-                    throw new Exception($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}");
-                }
-            });
+            if (process.ExitCode != 0) { throw new($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}"); }
+        });
 
-    Target Clean =>
-        _ => _
-            .Executes(() =>
-            {
-                DotNetClean(s => s
-                    .SetProject(_solution)
-                    .SetVerbosity(DotNetVerbosity.Quiet));
-            });
+    Target Clean => _ => _
+        .Executes(() =>
+        {
+            DotNetClean(s => s
+                .SetProject(_solution)
+                .SetVerbosity(DotNetVerbosity.quiet));
+        });
 
-    Target Restore =>
-        _ => _
-            .After(Clean)
-            .Executes(() =>
-            {
-                DotNetRestore(s => s
-                    .SetProjectFile(_solution));
-            });
+    Target Restore => _ => _
+        .After(Clean)
+        .Executes(() =>
+        {
+            DotNetRestore(s => s
+                .SetProjectFile(_solution));
+        });
 
-    Target Compile =>
-        _ => _
-            .After(Restore)
-            .Executes(() =>
-            {
-                DotNetBuild(s => s
-                    .SetProjectFile(_solution)
-                    .SetConfiguration(Configuration)
-                    .EnableNoRestore());
-            });
+    Target Compile => _ => _
+        .After(Restore)
+        .Executes(() =>
+        {
+            DotNetBuild(s => s
+                .SetProjectFile(_solution)
+                .SetConfiguration(Configuration)
+                .EnableNoRestore());
+        });
 
-    Target Publish =>
-        _ => _
-            .Executes(() =>
-            {
-                _publishPath.DeleteDirectory();
+    Target Publish => _ => _
+        .Executes(() =>
+        {
+            _publishPath.DeleteDirectory();
 
-                DotNetClean(s => s
-                    .SetProject(_projectDir)
-                    .SetVerbosity(DotNetVerbosity.Quiet)
-                    .SetConfiguration("Release")
-                    .SetOutput(_publishPath));
+            DotNetClean(s => s
+                .SetProject(_projectDir)
+                .SetVerbosity(DotNetVerbosity.quiet)
+                .SetConfiguration("Release")
+                .SetOutput(_publishPath));
 
-                DotNetPublish(s => s
-                    .SetProject(_projectDir)
-                    .SetConfiguration("Release")
-                    .SetRuntime(_runtimeId)
-                    .SetOutput(_publishBinPath));
+            DotNetPublish(s => s
+                .SetProject(_projectDir)
+                .SetConfiguration("Release")
+                .SetRuntime(_runtimeId)
+                .SetOutput(_publishBinPath));
 
-                CopyDirectoryRecursively(_databaseDirectory, _publishDbScriptsPath);
+            CopyDirectoryRecursively(_databaseDirectory, _publishDbScriptsPath);
 
-                CopyFileToDirectory(_roundhouseExePath, _publishDbPath);
-                CopyFileToDirectory(_dbPackageDeployScript, _publishDbPath);
-            });
+            CopyFileToDirectory(_roundhouseExePath, _publishDbPath);
+            CopyFileToDirectory(_dbPackageDeployScript, _publishDbPath);
+        });
 
-    Target Test =>
-        _ => _
-            .Executes(() =>
-            {
-                DotNetTest(s => s
-                    .SetProjectFile(_backendTestDir)
-                    .SetVerbosity(DotNetVerbosity.Quiet));
-            });
+    Target Test => _ => _
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(_backendTestDir)
+                .SetVerbosity(DotNetVerbosity.quiet));
+        });
 
-    Target CiCoverageReport =>
-        _ => _
-            .After(Compile)
-            .Executes(() =>
-            {
-                DotNet($"dotcover test --dcOutput=\"{_coverageReportXmlPath}\" --dcReportType=\"XML\" --dcFilters=\"{_coverageFilters}\"",
-                    _backendTestDir);
+    Target CiCoverageReport => _ => _
+        .After(Compile)
+        .Executes(() =>
+        {
+            DotNet($"dotcover test --dcOutput=\"{_coverageReportXmlPath}\" --dcReportType=\"XML\" --dcFilters=\"{_coverageFilters}\"",
+                _backendTestDir);
 
-                var coverageReport = new XmlDocument();
-                coverageReport.Load(_coverageReportXmlPath);
+            var coverageReport = new XmlDocument();
+            coverageReport.Load(_coverageReportXmlPath);
 
-                var coveragePercent = int.Parse(coverageReport.SelectSingleNode("/Root/@CoveragePercent").Value);
+            var coveragePercent = int.Parse(coverageReport.SelectSingleNode("/Root/@CoveragePercent").Value);
 
-                if (coveragePercent < _coveragePercentMinimum)
-                {
-                    throw new Exception($"Code coverage is {coveragePercent}%. Minimum allowed is {_coveragePercentMinimum}%.");
-                }
+            if (coveragePercent < _coveragePercentMinimum) { throw new($"Code coverage is {coveragePercent}%. Minimum allowed is {_coveragePercentMinimum}%."); }
 
-                Log.Information($"{coveragePercent}% code coverage!");
-            });
+            Log.Information($"{coveragePercent}% code coverage!");
+        });
 
 
     public static int Main() => Execute<Build>(x => x.CiPipeline);
@@ -163,10 +143,7 @@ partial class Build : NukeBuild
     {
         string directory = null;
 
-        if (fromOwnDirectory)
-        {
-            directory = Directory.GetParent(exePath).FullName;
-        }
+        if (fromOwnDirectory) { directory = Directory.GetParent(exePath).FullName; }
 
         return Run(exePath, args, directory);
     }
@@ -175,10 +152,7 @@ partial class Build : NukeBuild
     {
         var startInfo = new ProcessStartInfo(exePath);
 
-        if (workingDirectory != null)
-        {
-            startInfo.WorkingDirectory = workingDirectory;
-        }
+        if (workingDirectory != null) { startInfo.WorkingDirectory = workingDirectory; }
 
         startInfo.Arguments = args ?? string.Empty;
         startInfo.UseShellExecute = false;

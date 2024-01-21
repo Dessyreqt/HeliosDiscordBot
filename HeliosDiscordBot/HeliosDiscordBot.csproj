@@ -2,16 +2,16 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<UserSecretsId>dotnet-HeliosDiscordBot-4FF09281-A960-4ACF-A45B-39BDC8655790</UserSecretsId>
+		<UserSecretsId>HeliosDiscordBot</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Dapper" Version="2.1.24" />
+		<PackageReference Include="Dapper" Version="2.1.28" />
 		<PackageReference Include="Discord.Net" Version="3.13.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -42,7 +42,9 @@ You can use `!stopnotify sunrise` and `!stopnotify sunset` to stop being notifie
 
 ## Running Helios Locally
 
-If you want to build Helios for yourself and run it on your local machine, you'll need to set up a Discord bot token and set it using the dotnet user-secrets utility. From the csproj folder:
+If you want to build Helios for yourself and run it on your local machine, you'll need to set up a Discord bot token and set it using the dotnet user-secrets utility. You can get a Discord bot token here: [https://discord.com/developers/applications](https://discord.com/developers/applications). You'll need to create a new application, then add a bot to that application. You can then copy the token from the bot page.
+
+From the csproj folder:
 
 `dotnet user-secrets set "DiscordSettings:Token" "<Token>"`
 
