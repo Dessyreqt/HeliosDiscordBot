@@ -1,0 +1,4 @@
+assembly-versioning-scheme: MajorMinorPatchTag
+mode: ContinuousDeployment
+ignore:
+  sha: []
