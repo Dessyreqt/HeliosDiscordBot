@@ -1,7 +1,4 @@
-﻿USE [HeliosDiscordBot]
-GO
-/****** Object:  Table [dbo].[Notification]    Script Date: 4/5/2021 12:02:42 AM ******/
-SET ANSI_NULLS ON
+﻿SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
