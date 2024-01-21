@@ -4,13 +4,13 @@ GO
 DECLARE @Created bit
 SET @Created = 0
 
-IF NOT EXISTS(SELECT * FROM sys.databases WHERE [name] = 'HeliosDiscordBot')
+IF NOT EXISTS(SELECT * FROM sys.databases WHERE [name] = '{{DatabaseName}}')
 BEGIN
 	SET @Created = 1
 
-	CREATE DATABASE [HeliosDiscordBot]
+	CREATE DATABASE [{{DatabaseName}}]
 
-	ALTER DATABASE [HeliosDiscordBot] SET COMPATIBILITY_LEVEL = 130
+	ALTER DATABASE [{{DatabaseName}}] SET COMPATIBILITY_LEVEL = 130
 END
 
 SELECT @Created
