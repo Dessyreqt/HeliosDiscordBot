@@ -64,7 +64,10 @@ pipeline {
 		
 		stage('Publish') {
 			when {
-				branch 'main'
+				anyOf {
+					branch 'main'
+					tag 'v*'
+				}
 			}
 			steps {
 				bat 'nuke Publish'
