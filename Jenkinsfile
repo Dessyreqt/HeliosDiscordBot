@@ -45,11 +45,8 @@ pipeline {
 		}
 
 		stage('Database') {
-			when {
-				tag 'v*'
-			}
 			steps {
-				bat 'nuke RestoreDatabase'
+				bat 'nuke RestoreTestDatabase'
 			}
 		}
 

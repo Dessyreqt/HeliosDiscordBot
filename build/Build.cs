@@ -52,6 +52,18 @@ partial class Build : NukeBuild
             if (process.ExitCode != 0) { throw new($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}"); }
         });
 
+    Target RestoreTestDatabase => _ => _
+        .Before(Clean)
+        .Executes(() =>
+        {
+            var process = Run(_roundhouseExePath,
+                $"/d=\"{_databaseName}.Test\" /f=\"{_databaseDirectory}\" /s=\"{_databaseServer}\" /cds=\"{_createDatabaseScript}\" /silent /transaction");
+
+            process.WaitForExit();
+
+            if (process.ExitCode != 0) { throw new($"Problem running database migrations:\n{process.StandardOutput.ReadToEnd()}"); }
+        });
+
     Target DropDatabase => _ => _
         .Before(RestoreDatabase)
         .Executes(() =>
